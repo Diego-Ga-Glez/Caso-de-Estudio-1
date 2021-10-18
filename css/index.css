@@ -1,0 +1,13 @@
+div.divDim {
+    height: 330px;
+    width: 237px;
+}
+
+div.divCant{
+    height: 330px;
+    width: 237px;
+}
+
+div.divDim:hover{
+    opacity: 0.5;
+}

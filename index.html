@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<title>Inicio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<link href="css/index.css" rel="stylesheet" type="text/css">
+<link href="secciones.html">
+
+<style>
+    .w3-sidebar a {font-family: "Roboto", sans-serif}
+    body,h1,h2,h3,h4,h5,h6,.w3-wide {font-family: "Montserrat", sans-serif;}
+</style>
+
+<script src = datos.js></script>
+
+<script>
+    function seccion(cadena){
+        eliminar_div("nov");
+        eliminar_div("recom");
+
+        let sec = document.getElementById("nov");
+
+        for(let x in datos){
+            let num_x = parseInt(x)
+            if(cadena == datos[num_x].categoria){
+               div_libro(num_x,sec);
+            }
+        }
+
+        titulo = document.getElementById("titu_rec");
+        titulo.textContent = cadena;
+    }
+
+    function  eliminar_div(cadena){
+        let div = document.getElementById(cadena);
+
+        while (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+    }
+
+    function cargar(){
+
+        eliminar_div("nov");
+        eliminar_div("recom");
+
+        let sec = document.getElementById("nov");
+        let titulo = document.getElementById("titu")
+        titulo.textContent = "Novedades"
+        for(let x = 0; x < 8; x++){
+            div_libro(x,sec)
+        }
+
+        titulo = document.getElementById("titu_rec");
+        titulo.textContent = "";
+
+    }
+
+    function buscar(){
+
+        let titulo = document.getElementById("titu")
+        titulo.textContent = "Resultado"
+
+        let aux = document.getElementById("busc").value;
+        let sec = document.getElementById("nov");
+
+        eliminar_div("nov")
+        eliminar_div("recom")
+
+
+        for(let x in datos){
+            if(aux == datos[x].titulo){
+                div_libro(parseInt(x),sec);
+                var categoria = datos[x].categoria
+            }
+        }
+
+        titulo = document.getElementById("titu_rec")
+        titulo.textContent = "Recomendaciones"
+
+        let recomendaciones = document.getElementById("recom")
+        let cont = 0;
+
+        for(let y in datos){
+            if(categoria == datos[y].categoria && cont < 4 && aux != datos[y].titulo){
+                div_libro(parseInt(y),recomendaciones);
+                cont = cont + 1;
+            }
+        }
+
+    }
+
+    function div_libro(x,sec){
+        let libro = document.createElement("div");
+        libro.style.cssText = 'float:left; text-align: center;';
+        libro.className = "divDim";
+
+        libro.addEventListener("click", function (){
+
+            if(window.carro.includes(x) == false){
+                window.carro.push(x);
+                alert("Se ha agregado este producto al carrito");
+                window.console.log(carro)
+            }
+            else{
+                alert("Usted ya ha agregado este producto al carrito");
+            }
+        });
+
+
+        let foto = document.createElement("img");
+        foto.srcset = datos[x].imagen;
+        foto.style.cssText = "height: auto; max-width: 54%; padding-top: 8%;";
+
+        let nombre = document.createElement("p");
+        nombre.textContent = datos[x].titulo;
+
+        let precio = document.createElement("p");
+        precio.textContent = datos[x].costo;
+
+        libro.append(foto, nombre, precio);
+
+        sec.appendChild(libro);
+    }
+
+    function div_libro_cont(x,sec){
+        let libro = document.createElement("div");
+        libro.style.cssText = 'float:left; text-align: center;';
+        libro.className = "divDim";
+
+        let foto = document.createElement("img");
+        foto.srcset = datos[x].imagen;
+        foto.style.cssText = "height: auto; max-width: 54%; padding-top: 8%;";
+
+        let nombre = document.createElement("p");
+        nombre.textContent = datos[x].titulo;
+
+        let precio = document.createElement("p");
+        precio.textContent = datos[x].costo;
+
+        libro.append(foto, nombre, precio);
+
+        let cantidad = document.createElement("div");
+        cantidad.style.cssText = 'float:left; text-align: center;';
+        cantidad.className = "divCant";
+
+        let etiqueta = document.createElement("p");
+        etiqueta.textContent = "Cantidad:";
+        etiqueta.style.cssText = "padding-top: 30%;"
+
+
+        let num_cant = document.createElement("input");
+        num_cant.type = "number";
+        num_cant.value = 1;
+        num_cant.id = "num_cant" + x.toString();
+        num_cant.addEventListener("change", function (){
+            let cont = 0;
+            let mul = 0;
+            for(let i = 0; i < carro.length; i++){
+                mul = document.getElementById("num_cant" + carro[i].toString()).value;
+                cont += parseInt(datos[carro[i]].costo.slice(1))* mul;
+            }
+
+            let modificar = document.getElementById("titu_rec");
+            modificar.textContent = "Total = " + cont.toString();
+        });
+
+        cantidad.append(etiqueta, num_cant);
+
+        sec.append(libro, cantidad);
+    }
+
+    function carrito(){
+
+        eliminar_div("nov");
+        eliminar_div("recom");
+        let cont = 0;
+
+
+        let sec = document.getElementById("nov");
+
+        for(let i = 0; i < carro.length; i++){
+            div_libro_cont(carro[i], sec);
+            cont += parseInt(datos[carro[i]].costo.slice(1));
+        }
+
+        let titulo = document.getElementById("titu_rec");
+        titulo.textContent = "Total = " + cont.toString();
+
+        titulo = document.getElementById("titu");
+        titulo.textContent = "Carrito de compra";
+
+
+        let opciones = document.getElementById("recom");
+        opciones.style.cssText = "text-align: center;";
+
+        let formulario = document.createElement("form");
+
+
+        // FORMATO DE PAGO
+
+        let etiqueta = document.createElement("label");
+        etiqueta.textContent = "Formatos de pago:";
+        etiqueta.style.cssText = "padding-right:5%"
+
+        let respuesta = document.createElement("select");
+        respuesta.style.cssText = "width: 16%"
+
+
+        let opcion1 = document.createElement("option");
+        opcion1.textContent = "Tarjeta de credito";
+
+        let opcion2 = document.createElement("option");
+        opcion2.textContent = "Cheque";
+
+        respuesta.append(opcion1,opcion2);
+
+
+        //ENVIO
+
+        let etiqueta2 = document.createElement("label");
+        etiqueta2.textContent = "Tipo de envio:";
+        etiqueta2.style.cssText = "padding-right:8%"
+
+        let respuesta2 = document.createElement("select");
+        respuesta2.style.cssText = "width: 15%"
+
+
+        let opcion3 = document.createElement("option");
+        opcion3.textContent = "DHL";
+
+        let opcion4 = document.createElement("option");
+        opcion4.textContent = "FEDEX";
+
+        respuesta2.append(opcion3,opcion4);
+
+        //CORREO
+        let etiqueta3 = document.createElement("label");
+        etiqueta3.textContent = "Direccion:";
+        etiqueta3.style.cssText = "padding-right:5%"
+
+        let respuesta3 = document.createElement("input");
+
+        respuesta3.className = "formu"
+
+        //BOTONES
+        let boton = document.createElement("input")
+        boton.type = "submit";
+        boton.style.cssText = "margin-right: 10px"
+        boton.addEventListener("click", function (){
+            for(let i = 0; i < carro.length; i++){
+                let cantidad = document.getElementById("num_cant" + carro[i].toString()).value;
+                if(datos[carro[i]].cantidad < cantidad){
+                    alert("Su pedido sera fraccionado");
+                }
+            }
+            alert("Se ha procesado tu pedido");
+            carro = [];
+            carrito();
+
+        });
+
+        let boton2 = document.createElement("input")
+        boton2.type = "button";
+        boton2.value = "Eliminar todo"
+        boton2.addEventListener("click", function (){
+            carro = [];
+            carrito();
+        })
+
+
+
+
+        let salto = document.createElement("br")
+        let salto2 = document.createElement("br")
+        let salto3 = document.createElement("br")
+        let salto4 = document.createElement("br")
+        let salto5 = document.createElement("br")
+        let salto6 = document.createElement("br")
+        let salto7 = document.createElement("br")
+        let salto8 = document.createElement("br")
+
+        formulario.append(etiqueta,respuesta,salto,salto2,etiqueta2, respuesta2,salto3 ,salto4,etiqueta3, respuesta3, salto5,salto6,boton, boton2, salto7, salto8);
+        opciones.appendChild(formulario);
+
+
+    }
+</script>
+
+<body class="w3-content" style="max-width:1200px" onload="cargar()">
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-bar-block w3-white w3-collapse w3-top" style="z-index:3;width:250px" id="mySidebar">
+    <div class="w3-container w3-display-container w3-padding-16">
+        <i onclick="w3_close()" class="fa fa-remove w3-hide-large w3-button w3-display-topright"></i>
+        <h3 class="w3-wide" onclick="cargar()"><b>INICIO</b></h3>
+    </div>
+
+    <div class="w3-padding-64 w3-large w3-text-grey" style="font-weight:bold">
+        <a href="#" class="w3-bar-item w3-button" onclick="seccion('Literatura')">Literatura</a>
+        <a href="#" class="w3-bar-item w3-button" onclick="seccion('Infantiles')">Infantiles</a>
+        <a href="#" class="w3-bar-item w3-button" onclick="seccion('Autoayuda')">Autoayuda</a>
+        <a href="#" class="w3-bar-item w3-button" onclick="seccion('Arte')">Arte</a>
+        <a href="#" class="w3-bar-item w3-button" onclick="seccion('Ingenieria')">Ingenieria </a>
+    </div>
+
+    <a href="#footer" class="w3-bar-item w3-button w3-padding">Contacto</a>
+    <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding" onclick="document.getElementById('newsletter').style.display='block'">Newsletter</a>
+    <a href="#footer"  class="w3-bar-item w3-button w3-padding">Suscribete</a>
+</nav>
+
+<!-- Top menu on small screens -->
+<header class="w3-bar w3-top w3-hide-large w3-black w3-xlarge">
+    <div class="w3-bar-item w3-padding-24 w3-wide">LOGO</div>
+    <a href="javascript:void(0)" class="w3-bar-item w3-button w3-padding-24 w3-right" onclick="w3_open()"><i class="fa fa-bars"></i></a>
+</header>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:250px">
+
+    <!-- Push down content on small screens -->
+    <div class="w3-hide-large" style="margin-top:83px"></div>
+
+    <!-- Top header -->
+    <header class="w3-container w3-xlarge">
+        <div>
+            <input id="busc" type="text" style="width: 80%;margin-top: 13px" placeholder="Ingrese el nombre del libro">
+            <p class="w3-right">
+                <i class="fa fa-search" onclick="buscar()"></i>
+                <i class="fa fa-shopping-cart w3-margin-right" onclick="carrito()"></i>
+
+            </p>
+        </div>
+
+
+    </header>
+
+    <!-- Image header
+    <div class="w3-display-container w3-container">
+        <img src="https://cdn.gandhi.com.mx/media/slider/s/l/slider-ganador-premio-nobel.jpg" alt="Jeans" style="width:100%">
+    </div> -->
+
+    <div class="w3-container w3-text-grey">
+        <p id="titu"></p>
+    </div>
+
+    <!-- Product grid -->
+
+    <div id="nov" class="w3-row w3-grayscale"></div>
+
+    <div class="w3-container w3-text-grey">
+        <p id="titu_rec"> </p>
+    </div>
+
+    <div id="recom" class="w3-row w3-grayscale"></div>
+
+    <!--
+    <div className="w3-container">
+        <img src="https://img.a.transfermarkt.technology/portrait/big/8198-1631656078.jpg?lm=1" style="width:100%">
+        <p>Ripped Skinny Jeans<br><b>$24.99</b></p>
+    </div>
+    -->
+
+
+    <!-- Footer -->
+    <footer class="w3-padding-64 w3-light-grey w3-small w3-center" id="footer">
+        <div class="w3-row-padding">
+            <div class="w3-col s4">
+                <h4>Contact</h4>
+                <p>Questions? Go ahead.</p>
+                <form action="/action_page.php" target="_blank">
+                    <p><input class="w3-input w3-border" type="text" placeholder="Nombre" name="Name" required></p>
+                    <p><input class="w3-input w3-border" type="text" placeholder="Email" name="Email" required></p>
+                    <p><input class="w3-input w3-border" type="text" placeholder="Tema" name="Subject" required></p>
+                    <p><input class="w3-input w3-border" type="text" placeholder="Mensaje" name="Message" required></p>
+                    <button type="submit" class="w3-button w3-block w3-black">Mandar</button>
+                </form>
+            </div>
+
+            <div class="w3-col s4">
+                <h4>Empresa</h4>
+                <p><a href="#">Acerca de</a></p>
+
+                <p><a href="#">Soporte</a></p>
+                <p><a href="#">Nuestras tiendas</a></p>
+                <p><a href="#">Formas de envio</a></p>
+                <p><a href="#">Formas de pago</a></p>
+                <p><a href="#">Tarjetas de regalo</a></p>
+
+                <p><a href="#">Ayuda</a></p>
+            </div>
+
+            <div class="w3-col s4 w3-justify">
+                <h4>Tienda</h4>
+                <p><i class="fa fa-fw fa-map-marker"></i> Tienda de libros</p>
+                <p><i class="fa fa-fw fa-phone"></i> 0123456789</p>
+                <p><i class="fa fa-fw fa-envelope"></i> ejemplo@mail.com</p>
+                <h4>Aceptamos</h4>
+                <p><i class="fa fa-fw fa-cc-amex"></i> Cheques</p>
+                <p><i class="fa fa-fw fa-credit-card"></i> Tarjetas de credito</p>
+                <br>
+                <i class="fa fa-facebook-official w3-hover-opacity w3-large"></i>
+                <i class="fa fa-instagram w3-hover-opacity w3-large"></i>
+                <i class="fa fa-snapchat w3-hover-opacity w3-large"></i>
+                <i class="fa fa-pinterest-p w3-hover-opacity w3-large"></i>
+                <i class="fa fa-twitter w3-hover-opacity w3-large"></i>
+                <i class="fa fa-linkedin w3-hover-opacity w3-large"></i>
+            </div>
+        </div>
+    </footer>
+
+    <div class="w3-black w3-center w3-padding-24"></div>
+
+    <!-- End page content -->
+</div>
+
+<!-- Newsletter Modal
+<div id="newsletter" class="w3-modal">
+    <div class="w3-modal-content w3-animate-zoom" style="padding:32px">
+        <div class="w3-container w3-white w3-center">
+            <i onclick="document.getElementById('newsletter').style.display='none'" class="fa fa-remove w3-right w3-button w3-transparent w3-xxlarge"></i>
+            <h2 class="w3-wide">NEWSLETTER</h2>
+            <p>Join our mailing list to receive updates on new arrivals and special offers.</p>
+            <p><input class="w3-input w3-border" type="text" placeholder="Enter e-mail"></p>
+            <button type="button" class="w3-button w3-padding-large w3-red w3-margin-bottom" onclick="document.getElementById('newsletter').style.display='none'">Subscribe</button>
+        </div>
+    </div>
+</div>
+-->
+
+<script>
+    // Accordion
+    function myAccFunc() {
+        var x = document.getElementById("demoAcc");
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+
+    // Click on the "Jeans" link on page load to open the accordion for demo purposes
+    document.getElementById("myBtn").click();
+
+
+    // Open and close sidebar
+    function w3_open() {
+        document.getElementById("mySidebar").style.display = "block";
+        document.getElementById("myOverlay").style.display = "block";
+    }
+
+    function w3_close() {
+        document.getElementById("mySidebar").style.display = "none";
+        document.getElementById("myOverlay").style.display = "none";
+    }
+</script>
+
+</body>
+</html>
